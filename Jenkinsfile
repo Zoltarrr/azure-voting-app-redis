@@ -21,20 +21,35 @@ pipeline {
 
          }
       }
-      stage() {
+      stage('Start test app') {
          steps {
             pwsh(script: """
             docker-compose up -d
             ./scripts/test_container.ps1
-            """
-            )
-         }   
+            """)
+         }
+         post {
+            success {
+               echo "App started succeddfuly :)"
+            } 
+            failure {
+               echo "App failed to start :("
+            }
+         }
       }
-      stage() {
-
+      stage('Run Tests') {
+         steps {
+            pwsh(script: """
+            pytest ./tests/test_sample.py
+            """)
+         }
       }
-      stage() {
-
+      stage('Stop test app') {
+         steps{
+            pwsh(script: """
+            docker-compose down
+            """)
+         }
       }
    }
 
