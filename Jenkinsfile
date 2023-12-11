@@ -37,7 +37,7 @@ pipeline {
             }
          }
       }
-      // stage('Run Tests') {
+      // stage('Run Tests') { 
       //    steps {
       //       pwsh(script: """
       //       pytest ./tests/test_sample.py
@@ -49,6 +49,17 @@ pipeline {
             pwsh(script: """
             docker-compose down
             """)
+         }
+      }
+      stage('Push container') {
+         steps {
+            echo "Workspace is $WORKSPACE"
+            dir("$WORKSPACE/azure-vote") {
+               docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
+                  def image = docker.build('jenkins-course/jenkins-course:latest')
+                  image.push()
+               }
+            }
          }
       }
    }
